@@ -35,10 +35,10 @@ const CartBudget = () => {
         </div>
         {error ? (
             <div className='border max-w-[260px] my-1 border-solid border-red-300 bg-red-100 py-2 text-sm text-red-600 rounded-lg' role='alert'>
-                {initialValue < 0 && <p className='my-0'>El valor inicial no puede ser menor a 0.</p>}
-                {initialValue < (budget - CartValue) && <p className='my-0'>El valor inicial no puede ser menor a lo ya gastado.</p>}
-                {initialValue > 20000 && <p className='my-0'>El valor inicial no puede ser mayor a 20000.</p>}
-                {isNaN(initialValue) && <p className='my-0'>El valor inicial debe ser un número.</p>}
+                {initialValue < 0 && <p className='my-0'>The initial value cannot be less than 0.</p>}
+                {initialValue < (budget - CartValue) && <p className='my-0'>The initial value cannot be less than what has already been spent.</p>}
+                {initialValue > 20000 && <p className='my-0'>The initial value cannot be greater than 20000.</p>}
+                {isNaN(initialValue) && <p className='my-0'>The initial value must be a number.</p>}
             </div>
         ) : showButton ? (
             <button onClick={changeBudget} className='bg-green-200 w-full py-1 rounded-lg border border-solid border-green-500'>
