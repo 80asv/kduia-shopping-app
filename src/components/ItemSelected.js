@@ -1,33 +1,57 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 
 const ItemSelected = (props) => {
-    const { dispatch} = useContext(AppContext);
+    const { dispatch, expenses, Location, remaning } = useContext(AppContext);
 
     const [name, setName] = useState('');
     const [quantity, setQuantity] = useState('');
-    const [action, setAction] = useState('');
+    const [action, setAction] = useState('Add');
     
 
     const submitEvent = () => {
-
-        const item = {
-            name: name,
-            quantity: parseInt(quantity),
-        };
-
-        if(action === "Reduce") {
-            dispatch({
-                type: 'RED_QUANTITY',
-                payload: item,
-            });
-        } else {
-                dispatch({
-                    type: 'ADD_QUANTITY',
-                    payload: item,
-                });
-            }
+        if (name === '') {
+            alert('Please select an item');
+            return;
+        }
+        if (quantity === '') {
+            alert('Please enter a quantity');
+            return;
+        }
+        if (isNaN(quantity)) {
+            alert('Please enter a valid number');
+            return;
+        }
+        if (parseInt(quantity) <= 0) {
+            alert('Please enter a number greater than 0');
+            return;
+        }
+        if (remaning <= 0 && action === 'Add') {
+            alert('Cannot increase because remaining is equal to 0');
+            return;
+        }
+        if (parseInt(quantity) > remaning && action === 'Add') {
+            alert('Cannot increase because the quantity is greater than the remaining');
+            return;
+        }
+        if (parseInt(quantity) > remaning && action === 'Reduce') {
+            alert('Cannot decrease because the quantity is greater than the remaining');
+            return;
+        }  
+        dispatch({
+            type: 'EDIT_UNITPRICE',
+            payload: {
+                name,
+                typeOperation: action === 'Add' ? 'increment' : 'decrement',
+                value: parseInt(quantity),
+            },
+        });
+    
     };
+
+
+
+    console.log({ expenses, name})
 
     return (
         <div>
@@ -38,32 +62,26 @@ const ItemSelected = (props) => {
                 <label className="input-group-text" htmlFor="inputGroupSelect01">Items</label>
                 </div>
                   <select className="custom-select" id="inputGroupSelect01" onChange={(event) => setName(event.target.value)}>
-                        <option defaultValue>Choose...</option>
-                        <option value="Shirt" name="Shirt"> Shirt</option>
-                <option value="Dress" name="Dress">Dress</option>
-                <option value="Jeans" name="Jeans">Jeans</option>
-                <option value="Dinner set" name="Dinner set">Dinner set</option>
-                <option value="Bags" name="Bags">Bags</option>
+                        <option defaultValue value="" name="">Select an item</option>
+                        {expenses.map((expense) => (
+                            <option value={expense.name} name={expense.name}>{expense.name}</option>
+                        ))}
                   </select>
-
                     <div className="input-group-prepend" style={{ marginLeft: '2rem' }}>
-                <label className="input-group-text" htmlFor="inputGroupSelect02">Quantity</label>
+                <label className="input-group-text" htmlFor="inputGroupSelect02">Allocation</label>
                 </div>
                   <select className="custom-select" id="inputGroupSelect02" onChange={(event) => setAction(event.target.value)}>
-                  <option defaultValue value="Add" name="Add">Add</option>
-                <option value="Reduce" name="Reduce">Reduce</option>
+                        <option defaultValue value="Add" name="Add">Add</option>
+                        <option value="Reduce" name="Reduce">Reduce</option>
                   </select>  
-                  <span className="eco" style={{ marginLeft: '2rem', marginRight: '8px'}}></span>
-
+                  <span className="eco" style={{ marginLeft: '2rem', marginRight: '8px'}}>{Location}</span>
                     <input
                         required='required'
                         type='number'
                         id='cost'
                         value={quantity}
-                        style={{size: 10}}
-                        onChange={(event) => setQuantity(event.target.value)}>
-                        </input>
-
+                        className='border border-solid border-gray-300 p-1 w-20 rounded-md'
+                        onChange={(event) => setQuantity(event.target.value)}/>
                     <button className="btn btn-primary" onClick={submitEvent} style={{ marginLeft: '2rem' }}>
                         Save
                     </button>

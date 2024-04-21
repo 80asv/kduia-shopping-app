@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 
 const CartBudget = () => {
-    const { budget, dispatch, CartValue } = useContext(AppContext);
+    const { budget, dispatch, CartValue, Location } = useContext(AppContext);
     const [initialValue, setInitialValue] = useState(budget);
     const [showButton, setShowButton] = useState(false);
 

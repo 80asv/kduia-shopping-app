@@ -3,6 +3,7 @@ import { createContext, useReducer } from 'react';
 // 5. The reducer - this is used to update the state, based on the action
 export const AppReducer = (state, action) => {
 	let new_expenses = [];
+	console.log('action', {action});
 	switch (action.type) {
 		case 'MODIFY_BUDGET':
 			if (typeof action.payload === 'number') {
@@ -11,48 +12,49 @@ export const AppReducer = (state, action) => {
 			return {
 				...state,
 			};
-		case 'ADD_QUANTITY':
-			let updatedqty = false;
-			state.expenses.map((expense)=>{
-				if(expense.name === action.payload.name) {
-					expense.quantity = expense.quantity + action.payload.quantity;
-					updatedqty = true;
+		case 'INCREASE_BY_10':
+			state.expenses = state.expenses.map((expense) => {
+				if (expense.name === action.payload.name) {
+					return { ...expense, unitprice: expense.unitprice + 5 };
 				}
-				//If this item was not on the list and is just being added
-				if(!updatedqty) {
-					// let new_item = {"name":}
-				}
-				new_expenses.push(expense);
-				return true;
-			})
-			state.expenses = new_expenses;
-			action.type = "DONE";
+				return expense;
+			});
 			return {
 				...state,
 			};
-		case 'RED_QUANTITY':
-			state.expenses.map((expense)=>{
-				if(expense.name === action.payload.name) {
-					expense.quantity = expense.quantity - action.payload.quantity;
+		case 'DECREASE_BY_10':
+			state.expenses = state.expenses.map((expense) => {
+				if (expense.name === action.payload.name) {
+					return { ...expense, unitprice: expense.unitprice - 5 };
 				}
-				expense.quantity = expense.quantity < 0 ? 0: expense.quantity;
-				new_expenses.push(expense);
-				return true;
-			})
-			state.expenses = new_expenses;
+				return expense;
+			});
+			return {
+				...state,
+			};
+		case 'EDIT_UNITPRICE':
+			let updatedPrice = false;
+			state.expenses = state.expenses.map((expense)=>{
+				if(expense.name === action.payload.name) {
+					if(action.payload.typeOperation === 'increment') {
+						expense.unitprice += action.payload.value;
+					} else if(action.payload.typeOperation === 'decrement') {
+						expense.unitprice -= action.payload.value;
+					}
+					updatedPrice = true;
+				}
+				return expense;
+			});
+			if(!updatedPrice) {
+				// Si el item no estaba en la lista y se está agregando
+				// Aquí podrías agregar lógica para manejar este caso
+			}
 			action.type = "DONE";
 			return {
 				...state,
 			};
 		case 'DELETE_ITEM':
-			state.expenses.map((expense)=>{
-				if(expense.name === action.payload.name) {
-					expense.quantity = 0;
-				}
-				new_expenses.push(expense);
-				return true;
-			})
-			state.expenses = new_expenses;
+			state.expenses = state.expenses.filter((expense) => expense.name !== action.payload.name);
 			action.type = "DONE";
 			return {
 				...state,
@@ -78,7 +80,7 @@ const initialState = {
 		{ id: "Dinner set", name: 'Dinner set', quantity: 1, unitprice: 40 },
 		{ id: "Bags", name: 'Bags', quantity: 1, unitprice: 500 },
 	],
-	Location: '£'
+	Location: '$'
 };
 
 // 2. Creates the context this is the thing our components import and use to get the state
@@ -102,6 +104,7 @@ export const AppProvider = (props) => {
 				Location: state.Location,
 				budget: state.budget,
 				totalExpenses,
+				remaning: state.budget - totalExpenses,
 			}}
 		>
 			{props.children}
