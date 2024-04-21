@@ -1,9 +1,16 @@
-import React, { createContext, useReducer } from 'react';
+import { createContext, useReducer } from 'react';
 
 // 5. The reducer - this is used to update the state, based on the action
 export const AppReducer = (state, action) => {
 	let new_expenses = [];
 	switch (action.type) {
+		case 'MODIFY_BUDGET':
+			if (typeof action.payload === 'number') {
+				state.budget = action.payload;
+			}
+			return {
+				...state,
+			};
 		case 'ADD_QUANTITY':
 			let updatedqty = false;
 			state.expenses.map((expense)=>{
@@ -23,21 +30,20 @@ export const AppReducer = (state, action) => {
 			return {
 				...state,
 			};
-
-			case 'RED_QUANTITY':
-				state.expenses.map((expense)=>{
-					if(expense.name === action.payload.name) {
-						expense.quantity = expense.quantity - action.payload.quantity;
-					}
-					expense.quantity = expense.quantity < 0 ? 0: expense.quantity;
-					new_expenses.push(expense);
-					return true;
-				})
-				state.expenses = new_expenses;
-				action.type = "DONE";
-				return {
-					...state,
-				};
+		case 'RED_QUANTITY':
+			state.expenses.map((expense)=>{
+				if(expense.name === action.payload.name) {
+					expense.quantity = expense.quantity - action.payload.quantity;
+				}
+				expense.quantity = expense.quantity < 0 ? 0: expense.quantity;
+				new_expenses.push(expense);
+				return true;
+			})
+			state.expenses = new_expenses;
+			action.type = "DONE";
+			return {
+				...state,
+			};
 		case 'DELETE_ITEM':
 			state.expenses.map((expense)=>{
 				if(expense.name === action.payload.name) {
@@ -51,15 +57,14 @@ export const AppReducer = (state, action) => {
 			return {
 				...state,
 			};
-	case 'CHG_LOCATION':
-			action.type = "DONE";
-			state.Location = action.payload;
-			return {
-				...state
-			}
-
-		default:
-			return state;
+		case 'CHG_LOCATION':
+				action.type = "DONE";
+				state.Location = action.payload;
+				return {
+					...state
+				}
+			default:
+				return state;
 	}
 };
 
@@ -67,11 +72,11 @@ export const AppReducer = (state, action) => {
 const initialState = {
 	budget: 2000,
 	expenses: [
-		{ id: "Shirt", name: 'Shirt', quantity: 0, unitprice: 500 },
-		{ id: "Jeans", name: 'Jeans', quantity: 0, unitprice: 300 },
-		{ id: "Dress", name: 'Dress', quantity: 0, unitprice: 400 },
-		{ id: "Dinner set", name: 'Dinner set', quantity: 0, unitprice: 600 },
-		{ id: "Bags", name: 'Bags', quantity: 0, unitprice: 200 },
+		{ id: "Shirt", name: 'Shirt', quantity: 1, unitprice: 50 },
+		{ id: "Jeans", name: 'Jeans', quantity: 1, unitprice: 300 },
+		{ id: "Dress", name: 'Dress', quantity: 1, unitprice: 70 },
+		{ id: "Dinner set", name: 'Dinner set', quantity: 1, unitprice: 40 },
+		{ id: "Bags", name: 'Bags', quantity: 1, unitprice: 500 },
 	],
 	Location: '£'
 };
@@ -85,10 +90,8 @@ export const AppProvider = (props) => {
 	// 4. Sets up the app state. takes a reducer, and an initial state
 	const [state, dispatch] = useReducer(AppReducer, initialState);
 
-	const totalExpenses = state.expenses.reduce((total, item) => {
-		return (total = total + (item.unitprice*item.quantity));
-	}, 0);
-state.CartValue = totalExpenses;
+	const totalExpenses = state.expenses.reduce((total, item) => total + item.unitprice * item.quantity, 0);
+	state.CartValue = totalExpenses;
 
 	return (
 		<AppContext.Provider
@@ -96,7 +99,9 @@ state.CartValue = totalExpenses;
 				expenses: state.expenses,
 				CartValue: state.CartValue,
 				dispatch,
-				Location: state.Location
+				Location: state.Location,
+				budget: state.budget,
+				totalExpenses,
 			}}
 		>
 			{props.children}

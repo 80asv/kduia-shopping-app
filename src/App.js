@@ -1,23 +1,24 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-
 import { AppProvider } from './context/AppContext';
-import CartValue from './components/CartValue';
 import ExpenseList from './components/ExpenseList';
 import ItemSelected from './components/ItemSelected';
 import Location from './components/Location';
+import CartBudget from './components/CartBugdet';
+import Remaining from './components/Remaining';
+import SpentSoFar from './components/SpentSoFar';
 
 const App = () => {
     return (
         <AppProvider>
             <div className='container'>
-                <h1 className='mt-3'>Shopping App</h1>
-                <div className='row mt-3'> 
-                    <div className='col-sm'>
-                        <CartValue />
+                <h1 className='mt-3'>Company's buget location</h1>
+                <div className='flex w-full gap-2'> 
+                    <CartBudget />
+                    <div className='flex-1'>
+                        <Remaining />
                     </div>
-                    <div className='col-sm'>
+                    <SpentSoFar />
+                    <div className='flex-1'>
                         <Location />
                     </div>
                 </div>
